@@ -1,102 +1,111 @@
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 public class Main {
+    // 입력:
+    // int 형 N M, string형 M 사이즈 문자열
 
-    static int N;
-    static int M;
-    static int maxSafeZone = 0;
- 
+    // 빈칸 3개의 위치를 골라 벽을 만들기 실행
+    // 전체 경우의 수를 고려하여 바이러스가 퍼졌을 때,
+    // 안전영의 최대값 구하기.
+
+    static int N, M;
     static int[][] lab;
-    static int[][] dir = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
-    static List<int[]> virus = new ArrayList<>();
-    static List<int[]> empty = new ArrayList<>();
+    static int[][] DIR = { { 1, 0 }, { -1, 0 }, { 0, -1 }, { 0, 1 } };
 
-    public static void main(String[] args) {
+    static ArrayList<int[]> virus = new ArrayList<>();
+    static ArrayList<int[]> empty = new ArrayList<>();
 
-        Scanner sc = new Scanner(System.in);
+    static int maxSafezone = 0;
 
-        // 연구소의 크기를 입력받고
-        N = sc.nextInt();
-        M = sc.nextInt();
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(reader.readLine());
 
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        
         lab = new int[N][M];
 
-        // 바이러스, 벽, 빈칸 위치를 배열에 저장.
         for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(reader.readLine());
             for (int j = 0; j < M; j++) {
-                lab[i][j] = sc.nextInt();
-                if (lab[i][j] == 2) {
+                lab[i][j] = Integer.parseInt(st.nextToken());
+                if (lab[i][j] == 2)
                     virus.add(new int[] { i, j });
-                } else if (lab[i][j] == 0) {
+                else if (lab[i][j] == 0)
                     empty.add(new int[] { i, j });
-                }
             }
         }
-        // 벽 세우기
-        buildWalls(0, 0);
-        System.out.println(maxSafeZone);
+        buildWall(0, 0);
+        System.out.println(maxSafezone);
     }
+    
+    static void buildWall(int start, int count) {
 
-    static void buildWalls(int start, int count) {
         if (count == 3) {
-            // 벽을 3개 세우면 바이러스 확산
-            spreadvirus();
+            virusSimulation();
             return;
         }
-
         for (int i = start; i < empty.size(); i++) {
-            int[]  pos = empty.get(i);
-            
-                lab[pos[0]][pos[1]] = 1;
-                buildWalls( i+1,count + 1);
-                lab[pos[0]][pos[1]]= 0;
+            int[] pos = empty.get(i);
+            lab[pos[0]][pos[1]] = 1;
+            buildWall(i+1, count + 1);
+            lab[pos[0]][pos[1]] = 0;
         }
     }
 
-    static void spreadvirus() { // 바이러스 확산
-       
-        int[][] grid = new int[N][M];
+
+    static void virusSimulation() {
+        int[][] temp = new int[N][M];
+
         for (int i = 0; i < N; i++) {
-            grid[i] = lab[i].clone();
+            temp[i] = lab[i].clone();
         }
 
+        Queue<int[]> queue = new LinkedList<>();
         boolean[][] visited = new boolean[N][M];
+
         for (int[] pos : virus) {
-            dfs(grid, visited, pos[0], pos[1]);
+            queue.add(pos);
+            visited[pos[0]][pos[1]] = true;
         }
-        countSafedZone(grid);
-    }
+        while (!queue.isEmpty()) {
+            int[] cur = queue.poll();
+            int curRow = cur[0];
+            int curCol = cur[1];
 
-    static boolean isValid(int[][] grid, int r, int c) {
-        return (r >= 0 && r < N && c >= 0 && c < M && grid[r][c] == 0);
-    }
-
-    static void dfs(int[][] grid,boolean[][] visited, int r, int c) {
-        
-        visited[r][c] = true; 
-        grid[r][c] = 2;
-        for (int[] d : dir) {
-            int nextRow = r + d[0];
-            int nextCol = c + d[1];
-
-            if (isValid(grid, nextRow, nextCol)&& !visited[nextRow][nextCol]) {
-                grid[nextRow][nextCol] = 2;
-                dfs(grid,visited, nextRow, nextCol);
-            }
-        }
-    }
-
-    static void countSafedZone(int grid[][]) { // 안전구역 계산
-        int safeZone = 0;
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (grid[i][j] == 0) {
-                    safeZone++;
+            for (int[] dir : DIR) {
+                int nextRow = curRow + dir[0];
+                int nextCol = curCol + dir[1];
+                if (isValid(temp, nextRow, nextCol) && !visited[nextRow][nextCol] && temp[nextRow][nextCol]==0) {
+                    temp[nextRow][nextCol] = 2;
+                    visited[nextRow][nextCol] = true;
+                    queue.add(new int[] { nextRow, nextCol });           
                 }
             }
         }
-        maxSafeZone = Math.max(maxSafeZone, safeZone);
+        countSafezone(temp);
     }
+
+    static void countSafezone(int[][] grid) {
+        int safezone =0;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (grid[i][j] == 0)
+                    safezone++;
+            }
+        }
+        maxSafezone = Math.max(maxSafezone, safezone);
+    }
+    static boolean isValid(int[][] grid, int r, int c) {
+        return r >= 0 && r < N && c >= 0 && c < M;
+    }
+
 }
