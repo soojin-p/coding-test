@@ -54,7 +54,7 @@ import java.io.*;
 
     static void selectVirus(int start, int selectCnt) {
         if (selectCnt == M) {
-            simulation(emptySpace);
+            simulation();
             return;
         }
 
@@ -64,7 +64,7 @@ import java.io.*;
         }
     }
 
-    static void simulation(int empty){
+    static void simulation(){
         Queue<Virus> queue = new LinkedList<>();
         boolean[][] visited = new boolean[N][N];
         int infected =0;
@@ -82,8 +82,8 @@ import java.io.*;
                 int nc = curVirus.c + d[1];
 
                 if(isValid(visited, nr,nc)&& lab[nr][nc] !=1){
-                    if(lab[nr][nc]==0) empty--;
-                    if(empty==0){
+                    if(lab[nr][nc]==0) infected++;
+                    if(infected== emptySpace){
                         minTime = Math.min(minTime, curVirus.time+1);
                         return;
                     }  
