@@ -1,107 +1,100 @@
 import java.util.*;
 import java.io.*;
 
-class Main {
+ class Main {
     static class Virus {
-        int x, y, time;
+        int r, c, time;
 
-        Virus(int x, int y, int time) {
-            this.x = x;
-            this.y = y;
+        Virus(int r, int c, int time) {
+            this.r = r;
+            this.c = c;
             this.time = time;
         }
     }
 
     static int N, M;
-    static int[][] arr;
-    static int[] dx = {-1, 1, 0, 0};
-    static int[] dy = {0, 0, -1, 1};
+    static int[][] lab;
+    static int[][] dir = { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };
     static List<Virus> viruses = new ArrayList<>();
-    static Virus[] active;
-    static int resultMinTime = Integer.MAX_VALUE;
-    static int originEmptySpace = 0;
+    static Virus[] activated;
+    static int minTime = Integer.MAX_VALUE;
+    static int emptySpace = 0;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args)throws IOException{
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-
-        // input
-        st = new StringTokenizer(br.readLine());
+        StringTokenizer  st = new StringTokenizer(br.readLine());
+        
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        
-        arr = new int[N][N];
-        active = new Virus[M];
 
-        for (int i = 0; i < N; i++) {
+        lab = new  int[N][N];
+        activated = new Virus[M];
+
+        for(int i=0; i<N; i++){
             st = new StringTokenizer(br.readLine());
-
-            for (int j = 0; j < N; j++) {
-                arr[i][j] = Integer.parseInt(st.nextToken());
-
-                if (arr[i][j] == 0) {
-                    originEmptySpace++;
-                } else if (arr[i][j] == 2) {
+            for(int j =0; j<N; j++){
+                lab[i][j] = Integer.parseInt(st.nextToken());
+                if(lab[i][j] == 2){
                     viruses.add(new Virus(i, j, 0));
-                }
+                }else if(lab[i][j]==0) emptySpace ++;
             }
+
         }
 
-        // solution
-        if (originEmptySpace == 0) {
+        if(emptySpace ==0){
             System.out.println(0);
-        } else {
-            selectVirus(0, 0);
-            System.out.println(resultMinTime == Integer.MAX_VALUE ? -1 : resultMinTime);
+            return;
         }
+
+        selectVirus(0,0);
+        System.out.println(minTime == Integer.MAX_VALUE ? -1 : minTime);
+        return;
     }
 
-    // 백트래킹으로 M 개의 바이러스를 선택하는 Combination 구현
-    static void selectVirus(int start, int selectCount) {
-        if (selectCount == M) {
-            spreadVirus(originEmptySpace);
+    static void selectVirus(int start, int selectCnt) {
+        if (selectCnt == M) {
+            simulation(emptySpace);
             return;
         }
 
         for (int i = start; i < viruses.size(); i++) {
-            active[selectCount] = viruses.get(i);
-            selectVirus(i + 1, selectCount + 1);
+            activated[selectCnt] = viruses.get(i);
+            selectVirus(i + 1, selectCnt + 1);
         }
     }
 
-    // BFS 로 바이러스를 퍼트린다
-    static void spreadVirus(int emptySpace) {
-        Queue<Virus> q = new LinkedList<>();
-        boolean[][] infected = new boolean[N][N];
+    static void simulation(int empty){
+        Queue<Virus> queue = new LinkedList<>();
+        boolean[][] visited = new boolean[N][N];
+        int infected =0;
 
-        for (int i = 0; i < M; i++) {
-            Virus virus = active[i];
-            infected[virus.x][virus.y] = true;
-            q.add(virus);
+        for(Virus virus : activated){
+            visited[virus.r][virus.c] = true;
+            queue.add(virus);
         }
 
-        while (!q.isEmpty()) {
-            Virus virus = q.poll();
+        while (!queue.isEmpty()) {
+            Virus curVirus = queue.poll();
+           
+            for(int[] d: dir){
+                int nr = curVirus.r + d[0];
+                int nc = curVirus.c + d[1];
 
-            for (int i = 0; i < 4; i++) {
-                int nx = virus.x + dx[i];
-                int ny = virus.y + dy[i];
-
-                if (nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
-                if (infected[nx][ny] || arr[nx][ny] == 1) continue;
-
-                if (arr[nx][ny] == 0) {
-                    emptySpace--;
+                if(isValid(visited, nr,nc)&& lab[nr][nc] !=1){
+                    if(lab[nr][nc]==0) empty--;
+                    if(empty==0){
+                        minTime = Math.min(minTime, curVirus.time+1);
+                        return;
+                    }  
+                    visited[nr][nc] =true;
+                    queue.add(new Virus(nr, nc, curVirus.time+1));
                 }
-
-                if (emptySpace == 0) {
-                    resultMinTime = Math.min(resultMinTime, virus.time + 1);
-                    return;
-                }
-
-                infected[nx][ny] = true;
-                q.add(new Virus(nx, ny, virus.time + 1));
             }
         }
+    }
+
+    static boolean isValid(boolean[][] visited, int r, int c) {
+        return r >= 0 && r < N && c >= 0 && c < N && !visited[r][c];
     }
 }
