@@ -6,7 +6,8 @@ using namespace std;
 
 const int INF = 1e9;
 int N, E;
-vector<pair<int, int>> graph[8001]; // 인접 리스트
+//vector<pair<int, int>> graph[8001]; // 인접 리스트
+vector<vector<pair<int, int>>> graph;
 
 vector<int> dijkstra(int start) {
     // 1. 모든 노드의 거리를 무한대로 초기화
@@ -53,7 +54,7 @@ int main() {
     cin.tie(NULL);
     
     cin >> N >> E;
-
+  graph.resize(N + 1);
     for (int i = 0; i < E; i++) {
         int a, b, c;
         cin >> a >> b >> c;
