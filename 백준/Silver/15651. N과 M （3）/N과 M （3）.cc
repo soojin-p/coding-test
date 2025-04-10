@@ -8,7 +8,7 @@ int N,M;
 bool visited[8];
 int list[8];
 
-void dfs(int dep,int s){
+void dfs(int dep){
     if(dep==M){
         for(int i=0; i<M; i++){
             cout<<list[i]<<" ";
@@ -16,9 +16,9 @@ void dfs(int dep,int s){
         cout<<"\n";
         return;
     }
-    for(int i=s; i<=N; i++){
+    for(int i=1; i<=N; i++){
         list[dep]=i;
-        dfs(dep+1,s);
+        dfs(dep+1);
         
     }
 
@@ -29,6 +29,6 @@ int main(){
 
    cin>>N>>M;
 
-    dfs(0,1);
+    dfs(0);
    return 0;
 }
