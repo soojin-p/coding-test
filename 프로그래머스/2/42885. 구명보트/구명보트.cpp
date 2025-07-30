@@ -1,23 +1,33 @@
 #include <string>
 #include <vector>
-#include <bits/stdc++.h>
+#include <deque>
+#include <algorithm>
 using namespace std;
-
 
 int solution(vector<int> people, int limit) {
     int answer = 0;
+    deque<int> dq;
     sort(people.begin(), people.end());
-    int l =0;
-    int r = people.size()-1;
-    while(l<=r){
-        if(people[l]+people[r]<=limit){
-            l++;
-            r--;
+    
+    for(int p: people){
+        dq.push_back(p);
+    }
+    // 50 50 70 80
+    // 50 70 80
+    while(!dq.empty()){
+        if(dq.size()==1){
+             answer++;
+            break;
+        }
+        if(dq.front()+dq.back()>limit){
+            answer++;
+            dq.pop_back();
         }
         else{
-            r--;
+            answer++;
+            dq.pop_front();
+            dq.pop_back();
         }
-        answer++;
     }
     return answer;
 }
