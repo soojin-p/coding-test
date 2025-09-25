@@ -1,38 +1,46 @@
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-#define PRINT cout << tmp; line_length += tmp.size()
-#define NEXTLINE cout << '\n'; line_length = 0
+/*
+문제 접근 방법:
 
-int main() {
-	ios::sync_with_stdio(0), cin.tie(0), cout.tie(0);
-	string tmp = " ";
-	int line_length = 0;
+입력값의 길이를 모를 때 입력 받는 방법
+char a;
 
-	while (cin >> tmp) {
-		if (tmp.compare("<br>") == 0) {
-			NEXTLINE;
-		}
-		else if (tmp.compare("<hr>") == 0) {
-			if (line_length != 0) { NEXTLINE; }
-			for (int i = 0; i < 80; i++) {
-				cout << '-';
-			}
-			NEXTLINE;
-		}
-		else {
-			if (line_length + tmp.size() < 80) {
-				if (line_length != 0) { cout << ' '; line_length++; }
-				PRINT;
-			}
-			else {
-				NEXTLINE;
-				PRINT;
-			}
-		}
-	}
+while(cin >> a){ //while(!(cin >> a).eof)
+    cout << a;
+}
+- 스트림 연산 뒤에는 스트림 객체 반환
+- 그러나 스트림이 조건문에 들어가면 bool로 변환되어 true/false 반환
+참고: https://velog.io/@c-jeongyyun/CPP-EOF-%ED%8C%90%EB%8B%A8%ED%95%98%EA%B8%B0
 
-	return 0;
+시간 복잡도 분석: O(L) (L = 전체 입력 길이).
+
+*/
+#define NLINE  cout << "\n"; lineLen = 0;
+int main()
+{
+    string st;
+    int lineLen = 0;
+    while (cin >> st){
+        if (st == "<br>"){NLINE;}
+        else if (st == "<hr>"){
+            if (lineLen != 0) NLINE;
+            for(int i=0; i<80; i++) cout << "-";
+            NLINE;
+        }
+        else{
+            if (lineLen + st.length() >= 80) {NLINE;}
+            else{
+                if (lineLen != 0){
+                    cout << " ";
+                    lineLen++;
+                }
+            }
+            cout << st;
+            lineLen += st.length();
+        }
+    }
+    return 0;
 }
