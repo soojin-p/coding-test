@@ -18,29 +18,30 @@ while(cin >> a){ //while(!(cin >> a).eof)
 시간 복잡도 분석: O(L) (L = 전체 입력 길이).
 
 */
-#define NLINE  cout << "\n"; lineLen = 0;
+#define NLINE  cout << "\n"; len = 0;
 int main()
 {
     string st;
-    int lineLen = 0;
+    int len = 0;
     while (cin >> st){
         if (st == "<br>"){NLINE;}
         else if (st == "<hr>"){
-            if (lineLen != 0) NLINE;
+            if (len != 0) NLINE;
             for(int i=0; i<80; i++) cout << "-";
             NLINE;
         }
         else{
             if (lineLen + st.length() >= 80) {NLINE;}
             else{
-                if (lineLen != 0){
+                if (len != 0){
                     cout << " ";
-                    lineLen++;
+                    len++;
                 }
             }
             cout << st;
-            lineLen += st.length();
+            len += st.length();
         }
     }
     return 0;
 }
+
