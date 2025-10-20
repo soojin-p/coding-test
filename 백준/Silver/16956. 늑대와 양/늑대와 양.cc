@@ -60,8 +60,7 @@ int main() {
             }
         }
     }
-    cout<<ans>>"\n";
-     cout << 1 << '\n';
+    cout<<ans<<"\n";
     for (int r = 0; r < R; ++r) {
         for (int c = 0; c < C; ++c) cout << farm[r][c];
         cout << '\n';
