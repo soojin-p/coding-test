@@ -1,47 +1,70 @@
+#include <stdio.h>
 #include <bits/stdc++.h>
+
+
+/*
+접근방법:
+    wolf인접한 공간에 ship이 있으면, fail
+*/
 using namespace std;
+int R,C; //목장의 크기
+char farm[501][501];
+
+queue<pair<int,int>> wolf;
+int dx[4] ={-1,1,0,0};
+int dy[4] = {0,0,-1,1};
+
 
 int main() {
-    ios::sync_with_stdio(false);
+     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-
-    int R, C;
-    cin >> R >> C;
-    vector<string> a(R);
-    for (int r = 0; r < R; ++r) cin >> a[r];
-
-    int dx[4] = {-1, 1, 0, 0};
-    int dy[4] = {0, 0, -1, 1};
-
-    // 1) 늑대 주변에 양이 있는지 먼저 검사
-    for (int x = 0; x < R; ++x) {
-        for (int y = 0; y < C; ++y) {
-            if (a[x][y] != 'W') continue;
-            for (int k = 0; k < 4; ++k) {
-                int nx = x + dx[k], ny = y + dy[k];
-                if (nx < 0 || nx >= R || ny < 0 || ny >= C) continue;
-                if (a[nx][ny] == 'S') {
-                    cout << 0 << '\n';
-                    return 0; // 어떤 식으로 울타리를 둬도 이미 인접: 실패
-                }
+    
+    int ans =1;
+    cin>> R>>C;
+    for(int r=0; r<R; ++r){
+        for(int c=0; c<C; ++c){
+            cin>>farm[r][c];
+            if(farm[r][c]=='W'){
+                wolf.push({r,c});
             }
         }
     }
 
-    // 2) 인접 양이 없는 경우, 늑대 주변 빈칸을 울타리로 채움
-    for (int x = 0; x < R; ++x) {
-        for (int y = 0; y < C; ++y) {
-            if (a[x][y] != 'W') continue;
-            for (int k = 0; k < 4; ++k) {
-                int nx = x + dx[k], ny = y + dy[k];
-                if (nx < 0 || nx >= R || ny < 0 || ny >= C) continue;
-                if (a[nx][ny] == '.') a[nx][ny] = 'D';
+    while(!wolf.empty()){
+        auto [curx, cury] = wolf.front();
+        wolf.pop();
+
+        for(int i=0; i<4; i++){
+            int nx = curx+dx[i];
+            int ny = cury+dy[i];
+
+            if(nx<0 || nx>=R || ny<0 || ny>=C)continue;
+            if(farm[nx][ny]=='S'){
+                ans =0; cout<<ans;
+                return 0;
+            }   
+        }
+    }
+    for(int r=0; r<R; ++r){
+        for(int c=0; c<C; ++c){
+             if(farm[r][c]!='W') continue;
+            
+            for(int i=0; i<4; i++){
+            int nr = r+dx[i];
+            int nc = c+dy[i];
+
+            if(nr<0 || nr>=R || nc<0 || nc>=C)continue;
+            if(farm[nr][nc]=='.'){
+               farm[nr][nc]='D';
+                } 
             }
         }
     }
-
-    // 3) 성공 출력
-    cout << 1 << '\n';
-    for (int r = 0; r < R; ++r) cout << a[r] << '\n';
+    cout<<ans>>"\n";
+     cout << 1 << '\n';
+    for (int r = 0; r < R; ++r) {
+        for (int c = 0; c < C; ++c) cout << farm[r][c];
+        cout << '\n';
+    }
     return 0;
 }
